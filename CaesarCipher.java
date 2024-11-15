@@ -1,46 +1,48 @@
+public class CaesarCipher extends Cipher {
+	private int shift;
 
-public class CaesarCipher extends Cipher{
-	private final static int NUM_LETTERS = 26;
-	private final int shiftAmount;
-	
-	/**
-	 * @param amt - the distance to shift letters when encrypting
-	 */
-	public CaesarCipher(int amt){
-		shiftAmount = amt;
+	public CaesarCipher(int shift) {
+		this.shift = shift;
 	}
-	
-	public CaesarCipher(CaesarCipher other){
-		this.shiftAmount = other.shiftAmount;
-	}
-	
+
 	@Override
 	public char encrypt(char c) {
-		if(Character.isAlphabetic(c)){
-			final char base = (Character.isLowerCase(c) ? 'a' : 'A');		
-			// c - base is the index in the alphabet: 'a' becomes 0, 'b' becomes 1, etc.
-			return (char)(base + ((c - base + shiftAmount) % NUM_LETTERS));
+		if (Character.isAlphabetic(c)) {
+			char base = (Character.isLowerCase(c) ? 'a' : 'A');
+			return (char) ((c - base + shift) % 26 + base);
 		}
-		else{
-			return c;
-		}
+		return c;
 	}
 
 	@Override
 	public char decrypt(char c) {
-		if(Character.isAlphabetic(c)){
-			final char base = (Character.isLowerCase(c) ? 'a' : 'A');			
-			return (char)(base + ((c - base - shiftAmount + NUM_LETTERS) % NUM_LETTERS));
+		if (Character.isAlphabetic(c)) {
+			char base = (Character.isLowerCase(c) ? 'a' : 'A');
+			return (char) ((c - base - shift + 26) % 26 + base);
 		}
-		else{
-			return c;
-		}
+		return c;
 	}
 
-	// Returns a new object, a deep copy of the current object
+	@Override
+	public String encrypt(String str) {
+		StringBuilder result = new StringBuilder();
+		for (char c : str.toCharArray()) {
+			result.append(encrypt(c));
+		}
+		return result.toString();
+	}
+
+	@Override
+	public String decrypt(String str) {
+		StringBuilder result = new StringBuilder();
+		for (char c : str.toCharArray()) {
+			result.append(decrypt(c));
+		}
+		return result.toString();
+	}
+
 	@Override
 	public Cipher newCopy() {
-		return new CaesarCipher(this);
+		return new CaesarCipher(this.shift);
 	}
-
 }

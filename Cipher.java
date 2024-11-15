@@ -1,32 +1,30 @@
 import java.util.Scanner;
 
 public abstract class Cipher {
+
+    // Abstract methods for encryption and decryption on a single character
     public abstract char encrypt(char c);
 
     public abstract char decrypt(char c);
 
-    public String encrypt(String s){
-        Scanner scr = new Scanner(s);
-        scr.useDelimiter("");
-        StringBuilder sb = new StringBuilder("");
-        while (scr.hasNext()){
-            sb.append(encrypt(scr.next()));
+    // Encrypts a whole string by calling encrypt() on each character
+    public String encrypt(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            sb.append(encrypt(s.charAt(i)));  // Process each character
         }
         return sb.toString();
     }
 
-    public String decrypt(String s){
-        Scanner scr = new Scanner(s);
-        scr.useDelimiter("");
-        StringBuilder sb = new StringBuilder("");
-        while (scr.hasNext()){
-            sb.append(decrypt(scr.next()));
+    // Decrypts a whole string by calling decrypt() on each character
+    public String decrypt(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            sb.append(decrypt(s.charAt(i)));  // Process each character
         }
         return sb.toString();
     }
 
-    public Cipher newCopy(){
-        return newCopy();
-    }
-
+    // Create a new copy of this cipher. This needs to be overridden in the subclass.
+    public abstract Cipher newCopy();
 }

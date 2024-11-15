@@ -1,50 +1,42 @@
+import java.util.List;
 import java.util.ArrayList;
 
 public class VigenereCipher extends Cipher {
 
-	private ArrayList<CaesarCipher> subCiphers;
+	private List<Integer> shifts;  // List to store the shift values
 
-	// These variables keep track of which
-	//  CaesarCipher to use for the next encrypt
-	//  or decrypt operation, respectively.
-	private int nextIndexForEncrypt;
-	private int nextIndexForDecrypt;
-
-
-	public VigenereCipher(Iterable<Integer> shiftAmounts) {
-		nextIndexForEncrypt = 0;
-		nextIndexForDecrypt = 0;
-
-		subCiphers = new ArrayList<>();
-		for (Integer amt : shiftAmounts) {
-			subCiphers.add(new CaesarCipher(amt));
-		}
+	// Constructor to initialize the shifts
+	public VigenereCipher(List<Integer> shifts) {
+		this.shifts = shifts;
 	}
 
-	public VigenereCipher(VigenereCipher other) {
-		this.nextIndexForDecrypt = other.nextIndexForDecrypt;
-		this.nextIndexForEncrypt = other.nextIndexForEncrypt;
-		this.subCiphers = new ArrayList(other.subCiphers);
+	// Override the encrypt method to apply Vigenère cipher encryption
+	@Override
+	public char encrypt(char c) {
+		if (Character.isLetter(c)) {
+			char base = Character.isUpperCase(c) ? 'A' : 'a';  // Determine base (A or a)
+			int shift = shifts.get(0);  // Get the first shift value
+			shifts.add(shifts.remove(0));  // Rotate the shifts (shift for next character)
+			return (char) ((c - base + shift) % 26 + base);  // Apply the shift
+		}
+		return c;  // Non-letter characters remain unchanged
 	}
 
-		@Override
-		public char encrypt ( char c){
-			char res = subCiphers.get(nextIndexForEncrypt).encrypt(c);
-			nextIndexForEncrypt = (nextIndexForEncrypt + 1) % subCiphers.size();
-			return res;
+	// Override the decrypt method to apply Vigenère cipher decryption
+	@Override
+	public char decrypt(char c) {
+		if (Character.isLetter(c)) {
+			char base = Character.isUpperCase(c) ? 'A' : 'a';  // Determine base (A or a)
+			int shift = shifts.get(0);  // Get the first shift value
+			shifts.add(shifts.remove(0));  // Rotate the shifts (shift for next character)
+			return (char) ((c - base - shift + 26) % 26 + base);  // Apply the reverse shift
 		}
-
-		@Override
-		public char decrypt ( char c){
-			char res = subCiphers.get(nextIndexForDecrypt).decrypt(c);
-			nextIndexForDecrypt = (nextIndexForDecrypt + 1) % subCiphers.size();
-			return res;
-		}
-
-		// Returns a new object, a deep copy of the current object
-		@Override
-		public Cipher newCopy () {
-			return new VigenereCipher(this);
-		}
-
+		return c;  // Non-letter characters remain unchanged
 	}
+
+	// Create a new copy of the VigenereCipher instance
+	@Override
+	public Cipher newCopy() {
+		return new VigenereCipher(new ArrayList<>(this.shifts));  // Copy the shifts list
+	}
+}
